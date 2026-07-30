@@ -1,59 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Harish — Developer</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<div id="cursor-glow"></div>
-
-<section class="hero" id="hero">
-  <div class="hero-content">
-    <h1 class="hero-name">Harish</h1>
-    <p class="tagline">Developer. Writer. Lifelong learner.</p>
-    <div class="hero-buttons">
-      <a href="https://linkedin.com/in/harish" class="btn magnetic" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="mailto:harish@example.com" class="btn btn-outline magnetic">Email</a>
-    </div>
-  </div>
-  <div class="scroll-hint">
-    <span class="scroll-dot"></span>
-  </div>
-</section>
-
-<section class="section" id="skills">
-  <div class="section-inner">
-    <h2 class="section-title">Skills</h2>
-    <div id="skills-grid"></div>
-  </div>
-</section>
-
-<section class="section" id="blog">
-  <div class="section-inner">
-    <h2 class="section-title">Blog</h2>
-    <div id="post-list"></div>
-    <div id="post-view" hidden></div>
-  </div>
-</section>
-
-<footer>
-  <p>&copy; 2026 Harish. Built with vanilla JS, no frameworks.</p>
-</footer>
-
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js"
-  }
-}
-</script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script type="module" src="script.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Harish — Developer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
