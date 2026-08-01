@@ -3,12 +3,36 @@ import remarkGfm from 'remark-gfm'
 import type { Components } from 'react-markdown'
 
 const components: Components = {
+  h1: ({ children }) => <h1 className="text-3xl font-bold mt-12 mb-4 tracking-tightest">{children}</h1>,
+  h2: ({ children }) => <h2 className="text-2xl font-semibold mt-12 mb-4 tracking-tight">{children}</h2>,
+  h3: ({ children }) => <h3 className="text-xl font-semibold mt-10 mb-3">{children}</h3>,
+  h4: ({ children }) => <h4 className="text-lg font-semibold mt-8 mb-2">{children}</h4>,
+  p: ({ children }) => <p className="my-5 leading-[1.75] text-text/90">{children}</p>,
+  ul: ({ children }) => <ul className="my-5 pl-6 list-disc space-y-2 marker:text-subtle">{children}</ul>,
+  ol: ({ children }) => <ol className="my-5 pl-6 list-decimal space-y-2 marker:text-subtle">{children}</ol>,
+  li: ({ children }) => <li className="leading-[1.7] text-text/90">{children}</li>,
+  a: ({ href, children }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-accent underline decoration-accent/30 underline-offset-4 hover:decoration-accent transition-[text-decoration-color]"
+    >
+      {children}
+    </a>
+  ),
+  blockquote: ({ children }) => (
+    <blockquote className="my-6 pl-5 border-l-2 border-accent text-muted italic">
+      {children}
+    </blockquote>
+  ),
+  hr: () => <hr className="my-10 border-border" />,
   code({ className, children, ...props }) {
     const isInline = !className
     if (isInline) {
       return (
         <code
-          className="px-1.5 py-0.5 rounded text-[0.85em] bg-surface border border-surface-border font-mono text-[#e0e0e0]"
+          className="px-1.5 py-0.5 rounded text-[0.875em] font-mono bg-surface border border-border text-text/95"
           {...props}
         >
           {children}
@@ -16,69 +40,40 @@ const components: Components = {
       )
     }
     return (
-      <pre className="overflow-x-auto rounded-lg border border-surface-border bg-[#111] p-4 my-4 text-sm leading-relaxed">
-        <code className={`font-mono text-[#e0e0e0] ${className ?? ''}`} {...props}>
-          {children}
-        </code>
-      </pre>
-    )
-  },
-  pre({ children }) {
-    return <>{children}</>
-  },
-  a({ href, children }) {
-    return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-accent hover:underline underline-offset-2"
-      >
+      <code className={`font-mono text-sm ${className ?? ''}`} {...props}>
         {children}
-      </a>
+      </code>
     )
   },
-  blockquote({ children }) {
-    return (
-      <blockquote className="border-l-2 border-accent/40 pl-4 my-4 text-gray-400 italic">
-        {children}
-      </blockquote>
-    )
-  },
-  img({ src, alt }) {
-    return (
-      <img
-        src={src}
-        alt={alt ?? ''}
-        className="rounded-lg my-6 max-w-full border border-surface-border"
-      />
-    )
-  },
-  hr() {
-    return <hr className="my-8 border-surface-border" />
-  },
-  table({ children }) {
-    return (
-      <div className="overflow-x-auto my-4">
-        <table className="w-full text-sm border-collapse">{children}</table>
-      </div>
-    )
-  },
-  th({ children }) {
-    return (
-      <th className="border border-surface-border px-3 py-2 text-left font-semibold bg-surface">
-        {children}
-      </th>
-    )
-  },
-  td({ children }) {
-    return <td className="border border-surface-border px-3 py-2">{children}</td>
-  },
+  pre: ({ children }) => (
+    <pre className="my-6 overflow-x-auto rounded-lg border border-border bg-surface px-4 py-4 text-sm leading-relaxed">
+      {children}
+    </pre>
+  ),
+  img: ({ src, alt }) => (
+    <img
+      src={src}
+      alt={alt ?? ''}
+      loading="lazy"
+      className="my-8 rounded-lg border border-border max-w-full h-auto"
+    />
+  ),
+  table: ({ children }) => (
+    <div className="my-6 overflow-x-auto">
+      <table className="w-full text-sm border-collapse">{children}</table>
+    </div>
+  ),
+  th: ({ children }) => (
+    <th className="border border-border px-3 py-2 text-left font-semibold bg-surface text-text">
+      {children}
+    </th>
+  ),
+  td: ({ children }) => <td className="border border-border px-3 py-2 text-text/90">{children}</td>,
 }
 
 export default function MarkdownRenderer({ content }: { content: string }) {
   return (
-    <div className="prose-custom max-w-none [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-gray-300 [&_ul]:mb-4 [&_ol]:mb-4 [&_li]:text-gray-300 [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_h2]:mt-8 [&_h2]:mb-3 [&_h3]:mt-6 [&_h3]:mb-2 [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:mb-1">
+    <div className="text-base">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {content}
       </ReactMarkdown>

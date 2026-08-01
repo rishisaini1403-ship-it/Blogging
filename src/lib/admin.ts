@@ -47,9 +47,14 @@ function parseRaw(raw: string): { frontmatter: Record<string, unknown>; content:
     if (ci === -1) continue
     const k = line.slice(0, ci).trim()
     let v: unknown = line.slice(ci + 1).trim()
-    if (typeof v === 'string' && v.startsWith('"') && v.endsWith('"')) v = v.slice(1, -1)
-    if (typeof v === 'string' && v.startsWith('[') && v.endsWith(']')) {
-      v = v.slice(1, -1).split(',').map((s) => s.trim().replace(/^"|"$/g, ''))
+    if (typeof v === 'string') {
+      let s: string = v
+      if (s.startsWith('"') && s.endsWith('"')) s = s.slice(1, -1)
+      if (s.startsWith('[') && s.endsWith(']')) {
+        v = s.slice(1, -1).split(',').map((x: string) => x.trim().replace(/^"|"$/g, ''))
+      } else {
+        v = s
+      }
     }
     if (v === 'true') v = true
     if (v === 'false') v = false
@@ -59,7 +64,7 @@ function parseRaw(raw: string): { frontmatter: Record<string, unknown>; content:
 }
 
 export async function fetchAllAdminPosts(): Promise<AdminPost[]> {
-  const { posts } = await post({ action: 'list' }) as { posts: ApiFile[] }
+  const { posts } = (await post({ action: 'list' })) as { posts: ApiFile[] }
   return posts.map((f) => {
     const slug = f.name.replace(/\.md$/, '')
     const { frontmatter, content } = parseRaw(f.raw)

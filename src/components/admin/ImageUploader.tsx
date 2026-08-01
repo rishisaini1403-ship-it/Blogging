@@ -43,8 +43,8 @@ export default function ImageUploader() {
   }
 
   return (
-    <div className="p-4 rounded-lg border border-surface-border bg-surface">
-      <h3 className="text-sm font-medium text-white mb-3">Image Upload</h3>
+    <div className="p-4 rounded-md border border-border bg-surface">
+      <h3 className="text-sm font-medium text-text mb-3">Image upload</h3>
 
       <input
         ref={inputRef}
@@ -52,18 +52,18 @@ export default function ImageUploader() {
         accept="image/*"
         onChange={handleUpload}
         disabled={uploading}
-        className="block w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-accent/10 file:text-accent file:text-xs file:font-medium hover:file:bg-accent/20 transition-colors"
+        className="block w-full text-sm text-muted file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-accent/10 file:text-accent file:text-xs file:font-mono file:font-medium hover:file:bg-accent/20 transition-colors duration-150"
       />
 
-      {uploading && <p className="text-xs text-gray-500 mt-2">Uploading...</p>}
-      {error && <p className="text-xs text-red-400 mt-2">{error}</p>}
+      {uploading && <p className="font-mono text-xs text-muted mt-2">Uploading…</p>}
+      {error && <p className="font-mono text-xs text-red-400 mt-2">{error}</p>}
       {url && (
         <div className="mt-2 flex items-center gap-2">
-          <code className="text-xs text-accent truncate">{url}</code>
+          <code className="text-xs text-accent truncate font-mono">{url}</code>
           <button
             type="button"
             onClick={copyUrl}
-            className="text-xs text-gray-500 hover:text-white shrink-0 transition-colors"
+            className="font-mono text-xs text-muted hover:text-text transition-colors duration-150 shrink-0"
           >
             Copy
           </button>

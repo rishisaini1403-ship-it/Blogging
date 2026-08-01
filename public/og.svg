@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#0A0A0B"/>
+  <g transform="translate(96, 110)">
+    <text x="0" y="0" font-family="Fraunces, Georgia, serif" font-size="32" font-weight="500" fill="#9A9AA2" letter-spacing="0.5">Harish</text>
+  </g>
+  <g transform="translate(96, 240)">
+    <text x="0" y="0" font-family="Fraunces, Georgia, serif" font-size="96" font-weight="700" fill="#EDEDEF" letter-spacing="-2">Developer.</text>
+    <text x="0" y="100" font-family="Fraunces, Georgia, serif" font-size="96" font-weight="700" fill="#EDEDEF" letter-spacing="-2">Writer.</text>
+    <text x="0" y="200" font-family="Fraunces, Georgia, serif" font-size="96" font-weight="700" fill="#EDEDEF" letter-spacing="-2">Lifelong learner<tspan fill="#D9A45C">.</tspan></text>
+  </g>
+  <g transform="translate(96, 580)">
+    <circle cx="6" cy="-6" r="6" fill="#D9A45C"/>
+    <text x="24" y="0" font-family="JetBrains Mono, monospace" font-size="22" fill="#9A9AA2">harish.dev</text>
+  </g>
+</svg>

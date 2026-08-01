@@ -25,33 +25,37 @@ export default function LoginPage({ onLogin }: { onLogin: (pw: string) => Promis
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-6">
+    <main className="min-h-screen pt-32 px-6 flex items-center justify-center bg-bg">
       <form onSubmit={handleSubmit(submit)} className="w-full max-w-sm">
-        <h1 className="text-xl font-semibold text-white mb-6">Admin Login</h1>
+        <p className="font-mono text-xs text-muted mb-2">~/admin</p>
+        <h1 className="font-display text-2xl font-semibold text-text mb-6">Sign in</h1>
 
-        <input
-          type="password"
-          placeholder="Password"
-          autoFocus
-          autoComplete="current-password"
-          {...register('password')}
-          className="w-full px-4 py-2.5 rounded-lg border border-surface-border bg-surface text-white placeholder-gray-500 text-sm focus:outline-none focus:border-accent transition-colors"
-        />
+        <label className="block">
+          <span className="block font-mono text-xs text-muted mb-1.5">Password</span>
+          <input
+            type="password"
+            autoFocus
+            autoComplete="current-password"
+            {...register('password')}
+            className="w-full px-4 py-2.5 rounded-md bg-bg border border-border text-text placeholder-subtle text-sm focus:outline-none focus:border-accent transition-colors duration-150"
+          />
+        </label>
+
         {errors.password && (
-          <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>
+          <p className="text-red-400 text-xs mt-2 font-mono">{errors.password.message}</p>
         )}
         {error && (
-          <p className="text-red-400 text-xs mt-2">{error}</p>
+          <p className="text-red-400 text-xs mt-2 font-mono">{error}</p>
         )}
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full mt-4 px-4 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
+          className="w-full mt-5 bg-accent text-bg font-medium text-sm px-4 py-2.5 rounded-md hover:bg-accent/90 transition-colors duration-150 disabled:opacity-50"
         >
-          {isSubmitting ? 'Signing in...' : 'Sign in'}
+          {isSubmitting ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
-    </div>
+    </main>
   )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -24,15 +24,18 @@ function slugify(title: string): string {
     .replace(/^-|-$/g, '')
 }
 
-// Use localStorage key unique to this editor session
 const DRAFT_KEY = 'admin-editor-draft'
 
 export default function PostEditor({ existing }: { existing?: AdminPost | null }) {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const isEdit = !!existing
   const [md, setMd] = useState(existing?.content || '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  const prefillTitle = searchParams.get('title') || ''
+  const prefillTags = searchParams.get('tags') || ''
 
   const form = useForm<Form>({
     resolver: zodResolver(schema),
@@ -46,129 +49,153 @@ export default function PostEditor({ existing }: { existing?: AdminPost | null }
           published: existing.published,
         }
       : {
-          title: '',
-          slug: '',
+          title: prefillTitle,
+          slug: prefillTitle ? slugify(prefillTitle) : '',
           date: new Date().toISOString().slice(0, 10),
-          tags: '',
+          tags: prefillTags,
           excerpt: '',
           published: true,
         },
   })
 
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = form
+  const { register, handleSubmit, setValue, watch, formState: { errors, isDirty } } = form
   const title = watch('title')
   const slug = watch('slug')
 
-  // Auto-slug when creating
   useEffect(() => {
     if (!isEdit && title && !slug) {
       setValue('slug', slugify(title))
     }
   }, [title, slug, isEdit, setValue])
 
-  // Auto-save draft to localStorage every 30s
   useEffect(() => {
     const interval = setInterval(() => {
+      if (!isDirty && !md) return
       const data = { ...form.getValues(), md }
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(data))
     }, 30000)
     return () => clearInterval(interval)
-  }, [form, md])
+  }, [form, md, isDirty])
 
-  const submit = useCallback(async (data: Form) => {
-    setSaving(true)
-    setError('')
-    try {
-      const payload = {
-        slug: data.slug,
-        title: data.title,
-        date: data.date,
-        tags: data.tags.split(',').map((t) => t.trim()).filter(Boolean),
-        excerpt: data.excerpt,
-        published: data.published,
-        content: md,
+  const submit = useCallback(
+    async (data: Form) => {
+      setSaving(true)
+      setError('')
+      try {
+        const payload = {
+          slug: data.slug,
+          title: data.title,
+          date: data.date,
+          tags: data.tags.split(',').map((t) => t.trim()).filter(Boolean),
+          excerpt: data.excerpt,
+          published: data.published,
+          content: md,
+        }
+        if (isEdit) {
+          await updateAdminPost(data.slug, payload)
+        } else {
+          await createAdminPost(payload)
+        }
+        sessionStorage.removeItem(DRAFT_KEY)
+        navigate('/admin/posts')
+      } catch (e: any) {
+        setError(e.message || 'Save failed')
       }
-      if (isEdit) {
-        await updateAdminPost(data.slug, payload)
-      } else {
-        await createAdminPost(payload)
-      }
-      sessionStorage.removeItem(DRAFT_KEY)
-      navigate('/admin/posts')
-    } catch (e: any) {
-      setError(e.message || 'Save failed')
-    }
-    setSaving(false)
-  }, [md, isEdit, navigate])
+      setSaving(false)
+    },
+    [md, isEdit, navigate, form]
+  )
 
   return (
     <form onSubmit={handleSubmit(submit)} className="space-y-6">
-      {/* Meta fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Title</label>
-          <input {...register('title')} className="w-full px-3 py-2 rounded-lg border border-surface-border bg-surface text-white text-sm focus:outline-none focus:border-accent" />
-          {errors.title && <p className="text-red-400 text-xs mt-1">{errors.title.message}</p>}
+          <label className="block font-mono text-xs text-muted mb-1.5">Title</label>
+          <input
+            {...register('title')}
+            className="w-full px-3 py-2 rounded-md bg-bg border border-border text-text text-sm focus:outline-none focus:border-accent transition-colors duration-150"
+          />
+          {errors.title && <p className="text-red-400 text-xs mt-1 font-mono">{errors.title.message}</p>}
         </div>
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Slug</label>
-          <input {...register('slug')} className="w-full px-3 py-2 rounded-lg border border-surface-border bg-surface text-white text-sm focus:outline-none focus:border-accent" />
-          {errors.slug && <p className="text-red-400 text-xs mt-1">{errors.slug.message}</p>}
+          <label className="block font-mono text-xs text-muted mb-1.5">Slug</label>
+          <input
+            {...register('slug')}
+            className="w-full px-3 py-2 rounded-md bg-bg border border-border text-text text-sm font-mono focus:outline-none focus:border-accent transition-colors duration-150"
+          />
+          {errors.slug && <p className="text-red-400 text-xs mt-1 font-mono">{errors.slug.message}</p>}
         </div>
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Date</label>
-          <input type="date" {...register('date')} className="w-full px-3 py-2 rounded-lg border border-surface-border bg-surface text-white text-sm focus:outline-none focus:border-accent" />
-          {errors.date && <p className="text-red-400 text-xs mt-1">{errors.date.message}</p>}
+          <label className="block font-mono text-xs text-muted mb-1.5">Date</label>
+          <input
+            type="date"
+            {...register('date')}
+            className="w-full px-3 py-2 rounded-md bg-bg border border-border text-text text-sm font-mono focus:outline-none focus:border-accent transition-colors duration-150"
+          />
+          {errors.date && <p className="text-red-400 text-xs mt-1 font-mono">{errors.date.message}</p>}
         </div>
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Tags (comma-separated)</label>
-          <input {...register('tags')} placeholder="react, typescript" className="w-full px-3 py-2 rounded-lg border border-surface-border bg-surface text-white text-sm focus:outline-none focus:border-accent" />
+          <label className="block font-mono text-xs text-muted mb-1.5">Tags (comma-separated)</label>
+          <input
+            {...register('tags')}
+            placeholder="react, typescript"
+            className="w-full px-3 py-2 rounded-md bg-bg border border-border text-text text-sm font-mono focus:outline-none focus:border-accent transition-colors duration-150"
+          />
         </div>
         <div className="md:col-span-2">
-          <label className="block text-xs text-gray-500 mb-1">Excerpt</label>
-          <input {...register('excerpt')} className="w-full px-3 py-2 rounded-lg border border-surface-border bg-surface text-white text-sm focus:outline-none focus:border-accent" />
-          {errors.excerpt && <p className="text-red-400 text-xs mt-1">{errors.excerpt.message}</p>}
+          <label className="block font-mono text-xs text-muted mb-1.5">Excerpt</label>
+          <input
+            {...register('excerpt')}
+            className="w-full px-3 py-2 rounded-md bg-bg border border-border text-text text-sm focus:outline-none focus:border-accent transition-colors duration-150"
+          />
+          {errors.excerpt && <p className="text-red-400 text-xs mt-1 font-mono">{errors.excerpt.message}</p>}
         </div>
         <div className="flex items-center gap-2">
-          <input type="checkbox" {...register('published')} id="published" className="rounded border-surface-border bg-surface text-accent focus:ring-accent" />
-          <label htmlFor="published" className="text-sm text-gray-400">Published</label>
+          <input
+            type="checkbox"
+            {...register('published')}
+            id="published"
+            className="rounded border-border bg-bg text-accent focus:ring-accent"
+          />
+          <label htmlFor="published" className="text-sm text-muted">
+            Published
+          </label>
         </div>
       </div>
 
-      {/* Editor + Preview split */}
       <div>
-        <label className="block text-xs text-gray-500 mb-1">Content (Markdown)</label>
+        <label className="block font-mono text-xs text-muted mb-1.5">Content (Markdown)</label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <textarea
             value={md}
             onChange={(e) => setMd(e.target.value)}
             rows={20}
-            className="w-full px-3 py-2 rounded-lg border border-surface-border bg-surface text-white text-sm font-mono focus:outline-none focus:border-accent resize-y"
+            className="w-full px-3 py-2 rounded-md bg-bg border border-border text-text text-sm font-mono focus:outline-none focus:border-accent transition-colors duration-150 resize-y"
           />
-          <div className="rounded-lg border border-surface-border bg-[#111] p-4 overflow-y-auto max-h-[600px]">
+          <div className="rounded-md border border-border bg-bg p-4 overflow-y-auto max-h-[600px]">
             {md ? (
               <MarkdownRenderer content={md} />
             ) : (
-              <p className="text-gray-600 text-sm italic">Preview will appear here...</p>
+              <p className="font-mono text-sm text-subtle italic">Preview will appear here…</p>
             )}
           </div>
         </div>
       </div>
 
-      {error && <p className="text-red-400 text-xs">{error}</p>}
+      {error && <p className="text-red-400 text-xs font-mono">{error}</p>}
 
       <div className="flex items-center gap-3">
         <button
           type="submit"
           disabled={saving}
-          className="px-5 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
+          className="bg-accent text-bg font-medium text-sm px-5 py-2.5 rounded-md hover:bg-accent/90 transition-colors duration-150 disabled:opacity-50"
         >
-          {saving ? 'Saving...' : isEdit ? 'Update Post' : 'Create Post'}
+          {saving ? 'Saving…' : isEdit ? 'Update post' : 'Create post'}
         </button>
         <button
           type="button"
           onClick={() => navigate('/admin/posts')}
-          className="px-5 py-2.5 rounded-lg border border-surface-border text-gray-400 text-sm hover:text-white transition-colors"
+          className="px-5 py-2.5 rounded-md border border-border text-muted text-sm font-mono hover:text-text transition-colors duration-150"
         >
           Cancel
         </button>

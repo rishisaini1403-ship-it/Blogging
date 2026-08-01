@@ -2,6 +2,13 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchAllAdminPosts, deleteAdminPost, type AdminPost } from '../../lib/admin'
 
+function formatDate(iso: string): string {
+  if (!iso) return 'No date'
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return iso
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
 export default function PostList() {
   const [posts, setPosts] = useState<AdminPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -19,7 +26,9 @@ export default function PostList() {
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+  }, [])
 
   const filtered = posts.filter((p) => {
     const q = search.toLowerCase()
@@ -40,7 +49,7 @@ export default function PostList() {
   }
 
   if (loading) {
-    return <p className="text-sm text-gray-500">Loading posts...</p>
+    return <p className="font-mono text-sm text-muted">Loading posts…</p>
   }
 
   return (
@@ -48,15 +57,15 @@ export default function PostList() {
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <input
           type="text"
-          placeholder="Search posts..."
+          placeholder="Search posts…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 px-3 py-2 rounded-lg border border-surface-border bg-surface text-white placeholder-gray-500 text-sm focus:outline-none focus:border-accent"
+          className="flex-1 px-3 py-2 rounded-md bg-bg border border-border text-text placeholder-subtle text-sm font-mono focus:outline-none focus:border-accent transition-colors duration-150"
         />
         <select
           value={filterPublished}
           onChange={(e) => setFilterPublished(e.target.value as typeof filterPublished)}
-          className="px-3 py-2 rounded-lg border border-surface-border bg-surface text-white text-sm focus:outline-none focus:border-accent"
+          className="px-3 py-2 rounded-md bg-bg border border-border text-text text-sm font-mono focus:outline-none focus:border-accent transition-colors duration-150"
         >
           <option value="all">All</option>
           <option value="published">Published</option>
@@ -65,50 +74,51 @@ export default function PostList() {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-sm text-gray-500">No posts found.</p>
+        <p className="font-mono text-sm text-muted">No posts found.</p>
       ) : (
-        <div className="space-y-2">
+        <ul className="border-t border-border">
           {filtered.map((post) => (
-            <div
+            <li
               key={post.slug}
-              className="flex items-center gap-4 px-4 py-3 rounded-lg border border-surface-border bg-surface"
+              className="flex items-center gap-4 py-4 border-b border-border"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <Link
                     to={`/admin/posts/${post.slug}/edit`}
-                    className="text-sm font-medium text-white hover:text-accent transition-colors truncate"
+                    className="font-display text-base font-semibold text-text hover:text-accent transition-colors duration-150 truncate"
                   >
                     {post.title}
                   </Link>
                   {!post.published && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 leading-normal">
+                    <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 uppercase tracking-wide">
                       Draft
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {post.slug} &middot; {post.date || 'No date'}
+                <p className="font-mono text-xs text-muted mt-1">
+                  {post.slug} · {formatDate(post.date)}
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-4 shrink-0">
                 <Link
                   to={`/admin/posts/${post.slug}/edit`}
-                  className="text-xs text-gray-500 hover:text-accent transition-colors"
+                  className="font-mono text-xs text-muted hover:text-text transition-colors duration-150"
                 >
                   Edit
                 </Link>
                 <button
+                  type="button"
                   onClick={() => handleDelete(post.slug, post.title)}
-                  className="text-xs text-gray-500 hover:text-red-400 transition-colors"
+                  className="font-mono text-xs text-muted hover:text-red-400 transition-colors duration-150"
                 >
                   Delete
                 </button>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   )
