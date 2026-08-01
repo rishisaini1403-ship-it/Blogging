@@ -1,5 +1,5 @@
 ---
-title: "NEET 2026: A Test of Trust"
+title: "NEET 2026 :- A Test of Trust , Transparency"
 date: "2026-08-01"
 tags: ["#trust #neet"]
 excerpt: ""
