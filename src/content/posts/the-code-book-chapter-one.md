@@ -1,7 +1,7 @@
 ---
 title: "The Code Book :- Chapter One"
 date: "2026-08-01"
-tags: ["#cipher", "#encryption"]
+tags: ["cipher", "encryption"]
 excerpt: ""
 published: true
 ---
